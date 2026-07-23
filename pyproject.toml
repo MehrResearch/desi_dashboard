@@ -1,0 +1,31 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "desi-dashboard"
+version = "0.1.0"
+description = "Interactive marimo dashboard for Waters DESI-MS imaging data."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Mehr Research" }]
+dependencies = [
+    "marimo>=0.23.14",
+    "matplotlib>=3.8",
+    "numpy>=2.0",
+]
+
+[project.scripts]
+desi-dashboard = "desi_dashboard.cli:main"
+desi-dashboard-edit = "desi_dashboard.cli:edit"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/desi_dashboard"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "src/desi_dashboard",
+    "README.md",
+    "LICENSE",
+]

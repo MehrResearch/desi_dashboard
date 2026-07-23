@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+.venv/
+dist/
+build/
+*.egg-info/
+.DS_Store
+
+# Waters datasets and extracted outputs are intentionally not versioned.
+*.raw/
+*.npy
+*.npz
