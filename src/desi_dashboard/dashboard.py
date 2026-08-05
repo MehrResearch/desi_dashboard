@@ -53,6 +53,8 @@ def _():
         }
     )
 
+    mo._runtime.context.get_context().marimo_config["runtime"]["output_max_bytes"] = 25_000_000
+
     dashboard_style = mo.Html("""
     <style>
       :root {--content-width-medium: min(1600px, calc(100vw - 2rem));}
