@@ -9,7 +9,7 @@
 
 import marimo
 
-__generated_with = "0.23.14"
+__generated_with = "0.23.16"
 app = marimo.App(width="medium")
 
 
@@ -81,30 +81,29 @@ def _():
 
 @app.cell(hide_code=True)
 def _(Path, mo):
-    raw_candidates = sorted(Path.cwd().glob("*.raw"))
-    if not raw_candidates:
-        raise FileNotFoundError(f"No .raw directories found in {Path.cwd()}")
-
     raw_browser = mo.ui.file_browser(
         initial_path=Path.cwd(),
         selection_mode="directory",
         multiple=False,
-        restrict_navigation=True,
-        filter=lambda path: path.is_dir() and path.suffix.lower() == ".raw",
         label="Waters .raw dataset",
     )
-    return raw_browser, raw_candidates
+
+    raw_browser
+    return (raw_browser,)
 
 
 @app.cell(hide_code=True)
-def _(Path, WatersRaw, np, raw_browser, raw_candidates):
-    if raw_browser.value:
-        selected_raw_path = Path(raw_browser.value[0].path)
-    else:
-        selected_raw_path = raw_candidates[0]
+def _(Path, WatersRaw, mo, np, raw_browser):
+    mo.stop(
+        not raw_browser.value,
+        mo.md("Select a Waters `.raw` directory."),
+    )
 
-    if selected_raw_path.suffix.lower() != ".raw":
-        raise ValueError("Select a Waters .raw directory")
+    selected_raw_path = Path(raw_browser.value[0].path)
+    mo.stop(
+        selected_raw_path.suffix.lower() != ".raw",
+        mo.md("Select a Waters `.raw` directory."),
+    )
 
     raw_dataset = WatersRaw(selected_raw_path)
     function_number = sorted(raw_dataset.functions)[0]
@@ -132,7 +131,6 @@ def _(
     imaging,
     mo,
     ms_function,
-    raw_browser,
     raw_dataset,
     selected_raw_path,
     x_values,
@@ -161,7 +159,6 @@ def _(
         [
             dashboard_style,
             mo.md("# DESI-MS imaging dashboard"),
-            raw_browser,
             mo.md(
                 f"**{selected_raw_path.name}**  \n"
                 f"{_instrument}" + (f" · acquired {_acquired}" if _acquired else "")

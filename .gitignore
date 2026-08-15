@@ -5,6 +5,7 @@ dist/
 build/
 *.egg-info/
 .DS_Store
+__marimo__/
 
 # Waters datasets and extracted outputs are intentionally not versioned.
 *.raw/
