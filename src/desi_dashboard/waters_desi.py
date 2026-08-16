@@ -612,17 +612,19 @@ class WatersRaw:
             if not line.strip():
                 continue
             fields = line.split("\t")
-            if len(fields) != n_features + 5:
+            metadata = fields[3 + n_features :]
+            if len(metadata) not in (2, 3):
                 raise FormatError(
-                    f"{table_path}:{line_number}: expected {n_features + 5} fields, got {len(fields)}"
+                    f"{table_path}:{line_number}: expected {n_features + 5} "
+                    f"or {n_features + 6} fields, got {len(fields)}"
                 )
             try:
                 scans.append(int(fields[0]))
                 xs.append(float(fields[1]))
                 ys.append(float(fields[2]))
                 values.append([float(value) for value in fields[3 : 3 + n_features]])
-                regions.append(int(fields[-2]))
-                source_scans.append(int(fields[-1]))
+                regions.append(int(metadata[0]))
+                source_scans.append(int(metadata[1]))
             except ValueError as error:
                 raise FormatError(
                     f"Invalid number in {table_path}:{line_number}"
