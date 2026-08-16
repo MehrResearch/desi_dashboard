@@ -243,7 +243,7 @@ def _(imaging, mo, set_selected_pixels):
         label="Show selected-pixel markers",
     )
     show_native_scan = mo.ui.checkbox(
-        value=False, label="Use native profile spectra"
+        value=True, label="Use native profile spectra"
     )
 
     controls = mo.vstack(
@@ -272,18 +272,18 @@ def _(imaging, mo, set_selected_pixels):
     )
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _(imaging, ms_function, np, show_native_scan):
     native_mode = bool(show_native_scan.value)
     native_bin = 0.01
 
     if native_mode:
-        # One profile scan per pixel; ~0.3 s for the whole slide, so read eagerly and
-        # keep them resident. Every scan carries its own m/z axis.
-        native_profiles = [
-            ms_function.read_scan(int(scan_number) - 1, nonzero=True)
-            for scan_number in imaging.source_scan_numbers
-        ]
+        native_profiles = []
+        for _scan_number in imaging.source_scan_numbers:
+            _scan = ms_function.read_scan(int(_scan_number) - 1, nonzero=True)
+            _scan.mz = _scan.mz.astype(np.float32)
+            _scan.intensity = _scan.intensity.astype(np.float32)
+            native_profiles.append(_scan)
         source_mz_low = min(float(scan.mz[0]) for scan in native_profiles)
         source_mz_high = max(float(scan.mz[-1]) for scan in native_profiles)
     else:
@@ -310,7 +310,7 @@ def _(get_selected_pixels, imaging, pixel_slider):
     return (selected_pixels,)
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _(
     default_feature_index,
     full_mz_high,
@@ -363,7 +363,7 @@ def _(
     )
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _(
     full_mz_high,
     full_mz_low,
@@ -391,7 +391,12 @@ def _(
             _totals = np.zeros(_bin_count, dtype=float)
             for _pixel in selected_pixels:
                 _scan = native_profiles[_pixel]
-                _index = ((_scan.mz - full_mz_low) / native_bin).astype(np.intp)
+                # Index arithmetic in float64: doing it in float32 migrates
+                # points across 0.01 Da bin boundaries (~3% of peak height) for
+                # no speed gain, since bincount dominates.
+                _index = (
+                    (_scan.mz.astype(np.float64) - full_mz_low) / native_bin
+                ).astype(np.intp)
                 np.clip(_index, 0, _bin_count - 1, out=_index)
                 _totals += np.bincount(
                     _index, weights=_scan.intensity, minlength=_bin_count
@@ -405,7 +410,7 @@ def _(
     return feature_mean_intensity, spectrum_intensity, spectrum_mz
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _(
     imaging,
     native_mode,
@@ -418,13 +423,15 @@ def _(
 ):
     if native_mode:
         # Exact integration of the window on each scan's own m/z axis.
+        _window_low = np.float32(selected_mz_low)
+        _window_high = np.float32(selected_mz_high)
         ion_values = np.array(
             [
                 float(
                     scan.intensity[
-                        np.searchsorted(scan.mz, selected_mz_low, "left"):
-                        np.searchsorted(scan.mz, selected_mz_high, "right")
-                    ].sum()
+                        np.searchsorted(scan.mz, _window_low, "left"):
+                        np.searchsorted(scan.mz, _window_high, "right")
+                    ].sum(dtype=np.float64)
                 )
                 for scan in native_profiles
             ]
@@ -778,7 +785,7 @@ def _(
     return
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _(
     full_mz_high,
     full_mz_low,
