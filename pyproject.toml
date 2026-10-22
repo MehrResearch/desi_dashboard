@@ -11,14 +11,14 @@ requires-python = ">=3.11"
 license = { text = "MIT" }
 authors = [{ name = "Mehr Research" }]
 dependencies = [
-    "marimo>=0.23.14",
-    "matplotlib>=3.8",
     "numpy>=2.0",
 ]
 
-[project.scripts]
-desi-dashboard = "desi_dashboard.cli:main"
-desi-dashboard-edit = "desi_dashboard.cli:edit"
+[dependency-groups]
+dev = [
+    "marimo>=0.23.14",
+    "matplotlib>=3.8",
+]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/desi_dashboard"]

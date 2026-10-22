@@ -13,26 +13,15 @@ Install [uv](https://docs.astral.sh/uv/), change to a directory containing your
 Waters `.raw` data directories, then run:
 
 ```bash
-uvx --from git+https://github.com/MehrResearch/desi_dashboard desi-dashboard
+# run the app
+uvx marimo run --sandbox https://github.com/MehrResearch/desi_dashboard/blob/main/src/desi_dashboard/dashboard.py
+# edit the cells (changes are not saved back)
+uvx marimo edit --sandbox https://github.com/MehrResearch/desi_dashboard/blob/main/src/desi_dashboard/dashboard.py
 ```
 
 The dashboard opens in your browser and initially loads the first `.raw`
 directory in the current working directory. Use the file browser at the top to
 switch datasets.
-
-Additional arguments are forwarded to `marimo run`, for example:
-
-```bash
-uvx --from git+https://github.com/MehrResearch/desi_dashboard \
-  desi-dashboard --port 2718 --headless
-```
-
-To open the notebook in the marimo editor:
-
-```bash
-uvx --from git+https://github.com/MehrResearch/desi_dashboard \
-  desi-dashboard-edit
-```
 
 ## Features
 
@@ -57,12 +46,10 @@ uvx --from git+https://github.com/MehrResearch/desi_dashboard \
 git clone https://github.com/MehrResearch/desi_dashboard.git
 cd desi_dashboard
 
-uv run desi-dashboard
 uv run marimo edit src/desi_dashboard/dashboard.py
 ```
 
-Run either command from a directory containing the `.raw` datasets you want to
-inspect.
+Run it from a directory containing the `.raw` datasets you want to inspect.
 
 ## Python reader
 

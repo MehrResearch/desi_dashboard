@@ -3,6 +3,7 @@
 #     "marimo>=0.23.14",
 #     "matplotlib>=3.8",
 #     "numpy>=2.0",
+#     "desi-dashboard @ git+https://github.com/MehrResearch/desi_dashboard",
 # ]
 # requires-python = ">=3.11"
 # ///
@@ -20,7 +21,7 @@ def _():
     from matplotlib import pyplot as plt
     from pathlib import Path
 
-    from waters_desi import WatersRaw
+    from desi_dashboard.waters_desi import WatersRaw
 
     get_selected_pixels, set_selected_pixels = mo.state((0,))
     get_selected_mz_range, set_selected_mz_range = mo.state(None)
